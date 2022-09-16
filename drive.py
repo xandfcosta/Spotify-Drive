@@ -25,15 +25,31 @@ class Upload( ):
         gauth.SaveCredentialsFile( "mycreds.txt" )
         self.drive = GoogleDrive( gauth )
 
-    def upload( self ):        
+    def upload( self ):     
+        # file_list = self.drive.ListFile( { 'q': "'root' in parents and trashed=false" } ).GetList( )
+        # folder_exists = False
+        
+        # for file in file_list:
+        #     if file["title"] == "Spotify-Drive":
+        #         folder_main = file
+        #         folder_exists = True
+        #         break
+            
+        # if not folder_exists:
+        #     folder_main = self.drive.CreateFile( { "title" : "Spotify-Drive", "mimeType": "application/vnd.google-apps.folder" } )
+        #     folder_main.Upload( )
+        
         folder = self.drive.CreateFile( { "title" : self.folder_name, "mimeType": "application/vnd.google-apps.folder" } )
         folder.Upload( )
-
-        filenames = [f for f in os.listdir( ) ]
+        
+        os.chdir( "./musics")
+        
+        filenames = [ f for f in os.listdir( ) ]
         for file in filenames:
-            if ".mp3" in file:
-                file_drive = self.drive.CreateFile( {"name" : f"{ file }", "parents": [ { "kind": "drive#fileLink", "id": folder[ "id" ] } ] } )
-                file_drive.SetContentFile( file )
-                file_drive.Upload( )
-                del file_drive
-                os.remove( file )
+            file_drive = self.drive.CreateFile( {"name" : f"{file}", "parents": [ { "kind": "drive#fileLink", "id": folder[ "id" ] } ] } )
+            file_drive.SetContentFile( file )
+            file_drive.Upload( )
+            del file_drive
+        
+        os.chdir( "..")
+        shutil.rmtree( "./musics" )

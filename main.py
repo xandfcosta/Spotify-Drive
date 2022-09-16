@@ -1,15 +1,16 @@
+import multiprocessing
 import spotify
 from drive import Upload
 
 def main( ):
-    folder_name = input( "Playlist name: " )
-
-    music = []
+    with open( "configs.txt" ) as file:
+        musics = file.readlines()
+        musics = [line.rstrip() for line in musics]
     
-    link = input( "Link: " )
-    music.append( link )
+    folder_name = musics[ 0 ]
+    musics.pop( 0 )
 
-    spotify.download( music )
+    spotify.download( musics, threads= multiprocessing.cpu_count() )
 
     Upload( folder= folder_name )
 
